@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>$root $parent $refs</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <root-obj></root-obj>
+
+        <!-- 在 JavaScript 里直接访问一个子组件。为了达到这个目的，你可以通过 ref 特性为这个子组件赋予一个 ID 引用 -->
+        <base-input ref="usernameInput"></base-input>
+        <button v-on:click='refView'>通过ref访问子组件</button>
+
+    </div>
+    <script>
+        // Vue 子组件可以通过 $root 属性访问父组件实例的属性和方法
+        // root 和parent 都能够实现访问父组件的属性和方法，两者的区别在于，如果存在多级子组件，通过parent 访问得到的是它最近一级的父组件，通过root 访问得到的是根父组件
+        Vue.component('root-obj', {
+            data() {
+                return {
+
+                }
+            },
+            template: `<div id="parent">
+                            <button v-on:click='getRoot'>子组件</button>
+                            <child-component></child-component>
+                       </div>`,
+            methods: {
+                getRoot() {
+                    console.log(this.$el);
+                    console.log(this.$root.$el);
+                    console.log(this.$parent.$el);
+                }
+            }
+        });
+        Vue.component('child-component', {
+            data() {
+                return {
+
+                }
+            },
+            template: `<div id="child">
+                           <button v-on:click='getRoot'>子子组件</button>
+                       </div>`,
+            methods: {
+                getRoot() {
+                    console.log(this.$el);
+                    console.log(this.$root.$el);
+                    console.log(this.$parent.$el);
+                }
+            }
+        });
+        Vue.component('base-input', {
+            data() {
+                return {
+                    msg: 'base-input'
+                }
+            },
+            template: `<input type='text'/>`
+        });
+        var app = new Vue({
+            el: '#app',
+            data: {
+                msg: 'Root'
+            },
+            methods: {
+                refView() {
+                    console.log(this.$refs.usernameInput.$el);
+                    this.$refs.usernameInput.$el.focus();
+                    this.$refs.usernameInput.$el.value = 111;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>绑定类名</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app" class="static" v-bind:class="{ active: isActive, 'text-danger': hasError }"></div>
+    <div id="app2" v-bind:class="classObj"></div>
+    <div id="app3" v-bind:class="classObj2"></div>
+    <div id="app4" v-bind:class="[activeClass, errorClass]"></div>
+    <!-- 
+    <div v-bind:class="[isActive ? activeClass : '', errorClass]"></div>
+    <div v-bind:class="[{ active: isActive }, errorClass]"></div> 
+    -->
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isActive: true,
+                hasError: true
+            }
+        });
+        new Vue({
+            el: '#app2',
+            data: {
+                classObj: {
+                    active: true,
+                    'text-danger': true
+                }
+            }
+        });
+        new Vue({
+            el: '#app3',
+            data: {
+                isActive: true,
+                error: null
+            },
+            computed: {
+                classObj2: function () {
+                    return {
+                        active: this.isActive && !this.error,
+                        'text-danger': this.error && this.error.type === 'fatal'
+                    }
+                }
+            }
+        });
+        new Vue({
+            el: '#app4',
+            data: {
+                activeClass: 'active',
+                errorClass: 'text-danger'
+            }
+        });
+    </script>
+</body>
+
+</html>

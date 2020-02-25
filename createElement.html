@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>渲染函数</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <script type="text/x-template" id="anchored-heading-template">
+        <h1 v-if="level === 1">
+            <slot></slot>
+        </h1>
+        <h2 v-else-if="level === 2">
+            <slot></slot>
+        </h2>
+        <h3 v-else-if="level === 3">
+            <slot></slot>
+        </h3>
+        <h4 v-else-if="level === 4">
+            <slot></slot>
+        </h4>
+        <h5 v-else-if="level === 5">
+            <slot></slot>
+        </h5>
+        <h6 v-else-if="level === 6">
+            <slot></slot>
+        </h6>
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <anchored-heading v-bind:level="1">Hello world!</anchored-heading>
+        <anchored-heading2 v-bind:level="2">Hello world2!</anchored-heading2>
+
+        <!-- 使用 JavaScript 代替模板功能 -->
+        <todo-list v-bind:items="items"></todo-list>
+        <!-- 类似于：-->
+        <ul v-if="items.length">
+            <li v-for="item in items">{{ item.name }}</li>
+        </ul>
+        <p v-else>No items found.</p>
+
+        <!-- 表单元素，渲染函数中没有与 v-model 的直接对应——你必须自己实现相应的逻辑：-->
+        <input-model v-bind:value="value"></input-model>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                items: [
+                    { id: 1, name: 'jack' },
+                    { id: 2, name: 'candy' },
+                ]
+            },
+            components: {
+                // 普通方式使用模板
+                'anchored-heading': {
+                    template: '#anchored-heading-template',
+                    props: {
+                        level: {
+                            type: Number,
+                            required: true
+                        }
+                    }
+                },
+                // 渲染函数实现方式
+                'anchored-heading2': {
+                    render: function (createElement) {
+                        return createElement(
+                            'h' + this.level, // 标签名称
+                            this.$slots.default // 子节点数组，向组件中传递不带 v-slot 指令的子节点时，比如 anchored-heading2 中的 Hello world2!，这些子节点被存储在组件实例中的 $slots.default 中。
+                        );
+                    },
+                    props: {
+                        level: {
+                            type: Number,
+                            required: true
+                        }
+                    }
+                },
+                'todo-list': {
+                    props: ['items'],
+                    render: function (createElement) {
+                        if (this.items.length) {
+                            return createElement('ul', this.items.map(function (item) {
+                                return createElement('li', { attrs: { id: 'item' + item.id } }, item.name); //这里给 li 添加了 id
+                            }))
+                        } else {
+                            return createElement('p', 'No items found.');
+                        }
+                    }
+                },
+                'input-model': {
+                    props: ['value'],
+                    render: function (createElement) {
+                        self = this;
+                        return createElement('input', {
+                            domProps: { // 这里要用DOM属性
+                                value: self.value
+                            },
+                            on: {
+                                input: function (event) {
+                                    self.$emit('input', event.target.value);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

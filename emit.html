@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>$emit 触发当前实例上的事件。附加参数都会传给监听器回调</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <h3>vm.$emit( eventName, […args] )</h3>
+    <div id="emit-example-argument">
+        <magic-eight-ball v-on:give-advice="showAdvice"></magic-eight-ball> <!-- 3、监听到事件 就执行  showAdvice 事件（根节点定义的）-->
+    </div>
+    <script>
+        // 全局组件
+        Vue.component('magic-eight-ball', {
+            data: function () {
+                return {
+                    possibleAdvice: ['Yes', 'No', 'Maybe']
+                }
+            },
+            methods: {
+                giveAdvice: function () {
+                    var randomAdviceIndex = Math.floor(Math.random() * this.possibleAdvice.length);
+                    this.$emit('give-advice', this.possibleAdvice[randomAdviceIndex]); // 2、触发 give-advice事件、并携带参数（组件上监听的事件 v-on:give-advice）
+                }
+            },
+            template: `
+                        <button v-on:click="giveAdvice">
+                        Click me for advice
+                        </button>
+                    ` //1、点击触发 giveAdvice 事件（当前 methods 中定义的事件）
+        })
+        new Vue({
+            el: '#emit-example-argument',
+            methods: {
+                showAdvice: function (advice) { //监听函数，$emit 触发的事件 携带的参数 传入这个函数
+                    alert(advice);
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

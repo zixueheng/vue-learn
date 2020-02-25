@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>绑定样式</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app1" v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }">hello world</div>
+    <div id="app2" v-bind:style="styleObj">hello world</div>
+    <div id="app3" v-bind:style="[styleObj1, styleObj2]">hello world</div>
+    <script>
+        new Vue({
+            el: '#app1',
+            data: {
+                activeColor: 'red',
+                fontSize: 19
+            }
+        });
+        new Vue({
+            el: '#app2',
+            data: {
+                styleObj:{
+                    color: 'blue',
+                    fontSize: '20px'
+                }
+            }
+        });
+        new Vue({
+            el: '#app3',
+            data: {
+                styleObj1:{
+                    color: 'blue',
+                    fontSize: '20px'
+                },
+                styleObj2:{
+                    fontWeight: 'bold',
+                    fontSize: '14px'
+                }
+            }
+        });
+    </script>
+</body>
+</html>

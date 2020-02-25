@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>组件</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="components-demo">
+        <button-counter></button-counter>
+        <!-- <blog-post title="This is title"></blog-post> -->
+        <blog-post v-for="post in posts" v-bind:key="post.id" v-bind:title="post.title" v-bind:content="post.content">
+        </blog-post>
+
+        <!-- 重构上面的组件，以post对象形式解析 -->
+        <div v-bind:style="{fontSize: postFontSize+'em'}">
+            <!-- 通过 v-on 监听子组件实例的任意事件 -->
+            <blog-post-2 v-for="post in posts2" v-bind:key="post.id" v-bind:post="post"
+                v-on:enlarge="postFontSize += 0.1"></blog-post-2>
+        </div>
+
+        <div v-bind:style="{color: fontColor}">
+            <!-- v-on : 后面监听的是内部事件即模板中触发的事件，值是 vue对象中 methods 定义的方法 -->
+            <blog v-on:change_color="changeColor"></blog>
+        </div>
+
+        <!-- 在组件上使用 v-model -->
+        <custom-input v-model="searchText"></custom-input>
+        <!-- 等价于下面的方式 -->
+        <!-- <custom-input v-bind:value="searchText" v-on:input="searchText = $event"></custom-input> -->
+        <p>{{ searchText }}</p>
+    </div>
+
+    <script>
+        // 定义一个名为 button-counter 的新组件
+        Vue.component('button-counter', {
+            // 一个组件的 data 选项必须是一个函数，因此每个实例可以维护一份被返回对象的独立的拷贝
+            data: function () {
+                return {
+                    count: 0
+                }
+            },
+            template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
+        });
+
+        Vue.component('blog-post', {
+            props: ['title', 'content'], //props是要传入模板中的变量
+            template: '<div class="blog-post"><h3>{{ title }}</h3><p>{{ content }}</p></div>'
+        });
+
+        Vue.component('blog-post-2', {
+            props: ['post'], //这里的post是对象
+            template: `<div class="blog-post"> 
+                       <h3>{{ post.title }}</h3><p>{{ post.content }}</p>
+                       <button v-on:click="$emit('enlarge')">放大</button>
+                       
+                       </div>`
+            // 子组件可以通过调用内建的 $emit 方法 并传入事件名称来触发一个事件           
+        });
+
+        Vue.component('blog', {
+            // 一个组件的 data 选项必须是一个函数，因此每个实例可以维护一份被返回对象的独立的拷贝
+            data: function () {
+                return {
+                    content: 'This is my blog content'
+                }
+            },
+            template: `<div>{{ content }}<button v-on:click="$emit('change_color', 'red')">变色</button></div>`
+            // 这里传值给监听函数
+        });
+
+        Vue.component('custom-input', {
+            props: ['value'],
+            template: `<input v-bind:value="value" v-on:input="$emit('input', $event.target.value)"/>`
+        });
+
+        var components_demo = new Vue({
+            el: '#components-demo',
+            data: {
+                posts: [
+                    { id: 1, title: 'My journey with Vue', content: 'My journey with Vue' },
+                    { id: 2, title: 'Blogging with Vue', content: 'Blogging with Vue' },
+                    { id: 3, title: 'Why Vue is so fun', content: 'Why Vue is so fun' }
+                ],
+                posts2: [
+                    { id: 4, title: 'My journey with Vue', content: 'My journey with Vue' },
+                    { id: 5, title: 'Blogging with Vue', content: 'Blogging with Vue' },
+                    { id: 6, title: 'Why Vue is so fun', content: 'Why Vue is so fun' }
+                ],
+                postFontSize: 1,
+                fontColor: 'blue',
+                searchText: '',
+            },
+            methods: {
+                changeColor: function (color) {
+                    this.fontColor = color;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

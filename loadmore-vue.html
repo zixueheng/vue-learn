@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue 滚动加载</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        .scroll_container {
+            width: 80%;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="scroll_container">
+            <div v-for="vo in list" style="border: 1px solid #eee;">
+                <h3>{{ vo.id }}: {{ vo.title }}</h3>
+                <!-- <p><img alt="" v-bind:src="vo.pic" height="200"></p> -->
+            </div>
+        </div>
+        <div v-if="isLoading" style="text-align: center;">
+            <div>Loading</div>
+        </div>
+        <div v-if="loadMore==false" style="text-align: center;">
+            <div>No more</div>
+        </div>
+    </div>
+    <script>
+        const api = 'https://yxjp.ahyaxin.cn/api/index/article';
+        new Vue({
+            el: '#app',
+            data: {
+                page: 1,
+                list: [], //数据
+                isLoading: false, //是否显示加载提示
+                loadMore: true, //是否还有下一页数据
+                endOfTheScreen: false //是否滚动到窗口底部
+            },
+            created: function () {
+                this.loadData(this.page++); //加载第一页数据
+                window.onscroll = () => { //绑定窗口滚动事件
+                    this.endOfTheScreen = this.checkScroll();
+                }
+            },
+            watch: {
+                endOfTheScreen(newValue) { //监听窗口是否滚动到底
+                    if (newValue) {
+                        this.loadData(this.page++); //加载下一页数据
+                    }
+                }
+            },
+            methods: {
+                checkScroll() {
+                    return window.scrollY + window.innerHeight == document.documentElement.offsetHeight;
+                },
+                loadData(page) {
+                    console.log(page);
+                    if (this.loadMore) {
+                        this.isLoading = true;
+                        this.postData(api, { page: page })
+                            .then(result => {
+                                this.resolveResult(result);
+                                this.isLoading = false;
+                            })
+                            .catch(error => console.error(error));
+                    }
+                },
+                postData(url, data) {
+                    // Default options are marked with *
+                    return fetch(url, {
+                        body: 'json=' + JSON.stringify(data), // must match 'Content-Type' header
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        // credentials: 'same-origin', // include, same-origin, *omit
+                        headers: {
+                            'content-type': 'application/x-www-form-urlencoded'
+                        },
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, cors, *same-origin
+                        redirect: 'follow', // manual, *follow, error
+                        referrer: 'no-referrer', // *client, no-referrer
+                    }).then(response => response.json()); // parses response to JSON
+                },
+                resolveResult(result) {
+                    if (result.status.succeed == 1) {
+                        if (result.paginated.more == 0) {
+                            this.loadMore = false;
+                        }
+                        this.list = this.list.concat(result.data);
+                    } else {
+                        this.loadMore = false;
+                        console.log(result.status.error_desc);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
