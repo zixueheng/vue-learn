@@ -11,19 +11,73 @@
 
 <body>
     <div id="app">
-        <!-- 在 HTML 中是 kebab-case 的 -->
-        <blog-post post-title="hello!"></blog-post>
+        <!-- 属性 在 HTML 中是 kebab-case 的 -->
+        <!-- post-title 是静态传值 -->
+        <!-- 传入一个对象的所有 property，可以使用不带参数的 v-bind (取代 v-bind:prop-name) -->
+        <blog-post post-title="hello!" v-bind:prop1="props1" v-bind:initial-counter="initialCounter" v-bind="post">
+        </blog-post>
+        <!-- 
+        <blog-post v-bind="post"></blog-post>
+        等价于：
+        <blog-post v-bind:id="post.id" v-bind:title="post.title"></blog-post> 
+        -->
+
+        <!-- required 和 placeholder 是非 prop 的 attribute（该组件未定义这两个 pro）-->
+        <base-input v-model="username" required placeholder="Enter your username" label="输入框"></base-input>
     </div>
 
     <script>
         Vue.component('blog-post', {
             // 在 JavaScript 中是 camelCase 的
-            props: ['postTitle'],
-            template: '<h3>{{ postTitle }}</h3>'
+            props: ['postTitle', 'initialCounter', 'size', 'prop1', 'id', 'title'],
+            template: `<div>
+                        <h3>{{ postTitle }}</h3>
+                        <h5>{{ prop1 }}</h5>
+                        <p> {{ count }} </p>
+                        <p>{{ id }}: {{ title}}</p>
+                    </div>`,
+            data: function () {
+                return {
+                    count: this.initialCounter // 使用 initialCounter 从外部用来传递一个初始值；然后赋值给 count 作为本地变量使用
+                }
+            },
+            computed: {
+                normalizedSize: function () {
+                    return this.size.trim().toLowerCase()  // 如果传入的外部变量需要转换 使用 计算属性
+                }
+            }
+        });
+
+        // 所有的 prop 都使得其父子 prop 之间形成了一个单向下行绑定：父级 prop 的更新会向下流动到子组件中，但是反过来则不行。
+        // 这样会防止从子组件意外变更父级组件的状态，从而导致你的应用的数据流向难以理解。
+        // 额外的，每次父级组件发生变更时，子组件中所有的 prop 都将会刷新为最新的值。这意味着你不应该在一个子组件内部改变 prop。如果你这样做了，Vue 会在浏览器的控制台中发出警告。
+
+        Vue.component('base-input', {
+            inheritAttrs: false, // 禁用 Attribute 自动继承到根元素上，然后在下面模板中 使用 $attrs 手动绑定非prop 的属性即 {required:true, placeholder:"Enter your username"} 到 input 标签上
+            props: ['label', 'value'],
+            template: `
+                <label>
+                {{ label }}
+                <input
+                    v-bind="$attrs"
+                    v-bind:value="value"
+                    v-on:input="$emit('input', $event.target.value)"
+                >
+                </label>
+            `
         });
 
         new Vue({
-            'el': '#app'
+            'el': '#app',
+            data: {
+                props1: '属性1',
+                initialCounter: 0,
+                post: {
+                    id: 1,
+                    title: 'My Journey with Vue'
+                },
+                username: ''
+            }
         });
     </script>
 

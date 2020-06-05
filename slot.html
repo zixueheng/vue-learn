@@ -58,19 +58,20 @@
 
         <current-user v-bind:user="user">
             <!-- 在父级作用域中，我们可以给 v-slot 带一个值来定义我们提供的插槽 prop 的名字：slotProps -->
+            <!-- 将包含所有插槽 prop 的对象命名为 slotProps，也可以使用其他名字 -->
             <template v-slot:default="slotProps">
                 <!-- 下里使用变量覆盖插槽中默认内容 -->
-                {{ slotProps.user.name }}
+                FullName: {{ slotProps.user.name }}
             </template>
         </current-user><br />
         <!-- 在上述情况下，当被提供的内容只有默认插槽时，组件的标签才可以被当作插槽的模板来使用。这样我们就可以把 v-slot 直接用在组件上： -->
         <current-user v-bind:user="user" v-slot:default="slotProps">
-            {{ slotProps.user.firstName }}
+            FirstName: {{ slotProps.user.firstName }}
         </current-user><br />
         <!-- 这种写法还可以更简单。就像假定未指明的内容对应默认插槽一样，不带参数的 v-slot 被假定对应默认插槽： -->
         <current-user v-bind:user="user" v-slot="slotProps">
-            {{ slotProps.user.firstName }}
-        </current-user>
+            FirstName: {{ slotProps.user.firstName }}
+        </current-user><br />
         <!-- 
         只要出现多个插槽，请始终为所有的插槽使用完整的基于 <template> 的语法： 
         <current-user>
@@ -83,6 +84,18 @@
             </template>
         </current-user>
         -->
+        <!-- 解构 插槽 属性 slotProps， 实际使用ES6语法 `let {user} = slotProps;` -->
+        <current-user v-bind:user="user" v-slot="{ user }">
+           Age: {{ user.age }}
+        </current-user><br />
+        <!-- 将 user 重命名为 person -->
+        <current-user v-bind:user="user" v-slot="{ user: person }">
+            Age: {{ person.age }}
+         </current-user>
+         <!-- 或者提供默认值，user2是undefined -->
+         <current-user v-bind:user="user" v-slot="{ user2= {age:18} }">
+            Age: {{ user2.age }}
+         </current-user>
 
         <!-- 跟 v-on 和 v-bind 一样，v-slot 也有缩写，即把参数之前的所有内容 (v-slot:) 替换为字符 #。例如 v-slot:header 可以被重写为 #header： -->
         <!-- <base-layout>

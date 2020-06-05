@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件修饰符</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div v-on:click="tip('父节点时间被触发')">
+            <a v-on:click="tip('子节点事件')">会触发父节点事件</a><br/>
+            <!-- .stop 阻止单击事件继续传播 -->
+            <a v-on:click.stop="tip('子节点事件')">不会触发父节点事件</a>
+        </div>
+
+        <!-- .prevent 提交事件不再重载页面，否则页面会被刷新 -->
+        <form v-on:submit.prevent="onSubmit">
+            <input type="text">
+            <button>提交表单</button>
+        </form>
+    </div>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+
+            },
+            methods: {
+                tip: function (msg) {
+                    alert(msg);
+                },
+                onSubmit: function(){}
+            }
+        });
+    </script>
+</body>
+
+</html>

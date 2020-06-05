@@ -33,6 +33,7 @@
         <blog-post post-title="hello!"></blog-post>
         <blog-post-2 postTitle="hello 2!"></blog-post-2>
 
+        <!-- 组件的 v-model -->
         <!-- 这里的 lovingVue 的值将会传入这个名为 checked 的 prop。同时当 <base-checkbox> 触发一个 change 事件并附带一个新的值的时候，这个 lovingVue 的属性将会被更新。 -->
         <base-checkbox v-model="lovingVue"></base-checkbox>
 
@@ -78,6 +79,7 @@
             props: {
                 checked: Boolean //注意你仍然需要在组件的 props 选项里声明 checked 这个 prop。
             },
+            // 模板里面的 触发的 change 事件是 model 中定义的 change
             template: `
                         <input
                         type="checkbox"

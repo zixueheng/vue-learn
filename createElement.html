@@ -44,7 +44,7 @@
         <p v-else>No items found.</p>
 
         <!-- 表单元素，渲染函数中没有与 v-model 的直接对应——你必须自己实现相应的逻辑：-->
-        <input-model v-bind:value="value"></input-model>
+        <input-model v-bind:value="inputValue" v-on:input="inputSet" ></input-model>
     </div>
 
     <script>
@@ -54,7 +54,8 @@
                 items: [
                     { id: 1, name: 'jack' },
                     { id: 2, name: 'candy' },
-                ]
+                ],
+                inputValue: ''
             },
             components: {
                 // 普通方式使用模板
@@ -100,15 +101,21 @@
                         self = this;
                         return createElement('input', {
                             domProps: { // 这里要用DOM属性
-                                value: self.value
+                                value: self.value,
+                                placeholder: "input something..."
                             },
                             on: {
                                 input: function (event) {
-                                    self.$emit('input', event.target.value);
+                                    self.$emit('input', event.target.value); // 触发 input-model 上的input 监听函数，并附带输入的值
                                 }
                             }
                         });
                     }
+                }
+            },
+            methods: {
+                inputSet: function(input){
+                    this.inputValue = input;
                 }
             }
         });
